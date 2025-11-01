@@ -1,40 +1,51 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { useMutation } from '@tanstack/react-query'
-import { toast } from "react-toastify";
-import ProjectForm from "@/components/projects/ProjectForm";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import ProjectForm from "./ProjectForm";
 import type { ProjectFormData } from "@/types/index";
-import { createProject } from "@/api/ProjectAPI";
+import { useForm } from "react-hook-form";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { updateProject } from "@/api/ProjectAPI";
+import { toast } from "react-toastify";
 
-export default function CreateProyectView() {
-
+type EditProjectFormProps = {
+    data: ProjectFormData
+}
+export default function EditProjectForm({data} : EditProjectFormProps) {
     const navigate = useNavigate()
+    const params = useParams()
+    const projectId = params.projectId!
 
-    const initialValues : ProjectFormData= {
-        projectName: "",
-        clientName: "",
-        description: ""
-    }
-    const { register, handleSubmit, formState: {errors} } = useForm({defaultValues: initialValues})
+    const { register, handleSubmit, formState: {errors} } = useForm({defaultValues: {
+        projectName: data.projectName,
+        clientName: data.clientName,
+        description: data.description
+    }})
 
+    const queryClient = useQueryClient()
     const { mutate } = useMutation({
-        mutationFn: createProject,
+        mutationFn: updateProject,
         onError: (error)=> {
             toast.error(error.message)
         },
         onSuccess: (data)=> {
+            queryClient.invalidateQueries({queryKey: ['projects']})
+            queryClient.invalidateQueries({queryKey: ['editProject', projectId]})
             toast.success(data)
             navigate('/')
         }
     })
 
-    const handleForm = (formData : ProjectFormData) => mutate(formData)
-
+    const handleForm = (formData: ProjectFormData) => {
+        const data = {
+            formData,
+            projectId
+        }
+        mutate(data)
+    }
     return (
         <>
             <div className="max-w-3xl mx-auto">
-                <h1 className="text-5xl font-black">Crear Proyecto</h1>
-                <p className="text-2xl font-light text-gray-500 mt-5">Llena el siguiente formulario para crear un proyecto</p>
+                <h1 className="text-5xl font-black">Editar Proyecto</h1>
+                <p className="text-2xl font-light text-gray-500 mt-5">Llena el siguiente formulario para editar el proyecto</p>
 
                 <nav className="my-5">
                     <Link
@@ -54,7 +65,7 @@ export default function CreateProyectView() {
                     />
                     <input 
                         type="submit"
-                        value='Crear Poryecto'
+                        value='Guardar Cambios'
                         className="bg-fuchsia-600 w-full p-3 text-white uppercase font-bold hover:bg-fuchsia-700 cursor-pointer transition-colors"
                     />
                 </form>
