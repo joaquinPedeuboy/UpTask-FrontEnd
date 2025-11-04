@@ -9,17 +9,17 @@ export default function EditTaskData() {
     const projectId = params.projectId!
     const location = useLocation()
     const queryParams = new URLSearchParams(location.search)
-    const editTask = queryParams.get('editTask')!
+    const taskId = queryParams.get('editTask')!
 
     const { data, isError } = useQuery({
-        queryKey: ['task', editTask],
-        queryFn: ()=> getTaskById({projectId, taskId: editTask}),
-        enabled: !!editTask,
+        queryKey: ['task', taskId],
+        queryFn: ()=> getTaskById({projectId, taskId: taskId}),
+        enabled: !!taskId,
         retry: false
     })
 
     if(isError) return <Navigate to={'/404'} />
     if(data) {
-        return <EditTaskModal data={data} taskId={editTask}/>
+        return <EditTaskModal data={data} taskId={taskId}/>
     }
 }

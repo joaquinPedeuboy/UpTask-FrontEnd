@@ -21,33 +21,34 @@ export default function EditTaskModal({data, taskId} : EditTaskModalProps) {
     const projectId = params.projectId!
 
     const { register, handleSubmit, reset, formState: {errors} } = useForm<TaskFormData>({defaultValues: {
-      name: data.name,
-      description: data.description
+        name: data.name,
+        description: data.description
     }})
 
     const queryClient = useQueryClient()
     const { mutate } = useMutation({
-      mutationFn: updateTask,
-      onError: (error)=> {
-          toast.error(error.message)
-      },
-      onSuccess: (data)=> {
-            queryClient.invalidateQueries({queryKey: ['editProject', projectId]})
+        mutationFn: updateTask,
+        onError: (error)=> {
+            toast.error(error.message)
+        },
+        onSuccess: (data)=> {
+            queryClient.invalidateQueries({queryKey: ['project', projectId]})
+            queryClient.invalidateQueries({queryKey: ['task', taskId]})
             toast.success(data)
             reset()
             navigate(location.pathname, {replace: true})
-      }
+        }
     })
 
     const handleEditTask = (formData: TaskFormData)=> {
-      const data = {
-        projectId,
-        taskId,
-        formData
-      }
-      mutate(data)
-      console.log(formData)
-    }
+        const data = {
+            projectId,
+            taskId,
+            formData
+        }
+        mutate(data)
+            console.log(formData)
+        }
 
     return (
         <Transition appear show={true} as={Fragment}>
@@ -92,10 +93,10 @@ export default function EditTaskModal({data, taskId} : EditTaskModalProps) {
                                     onSubmit={handleSubmit(handleEditTask)}
                                     noValidate
                                 >
-                                    <TaskForm 
-                                      register={register}
-                                      errors={errors}
-                                    />
+                                <TaskForm 
+                                    register={register}
+                                    errors={errors}
+                                />
                     
                                     <input
                                         type="submit"

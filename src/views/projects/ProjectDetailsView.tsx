@@ -4,6 +4,8 @@ import { getProjectById } from "@/api/ProjectAPI"
 import AddTaskModal from "@/components/tasks/AddTaskModal"
 import TaskList from "@/components/tasks/TaskList"
 import EditTaskData from "@/components/tasks/EditTaskData"
+import TaskModalDetails from "@/components/tasks/TaskModalDetails"
+import { Puff } from "react-loader-spinner"
 
 export default function ProjectDetailsView() {
 
@@ -17,7 +19,21 @@ export default function ProjectDetailsView() {
         retry: false
     })
 
-    if(isLoading) return 'Cargando...'
+    if (isLoading) {
+        return (
+        <div className="flex flex-col justify-center items-center h-screen space-y-5">
+            <Puff
+            height={100}
+            width={100}
+            color="#a855f7" // color fucsia similar a tus botones
+            ariaLabel="puff-loading"
+            />
+            <p className="text-gray-500 text-xl font-semibold animate-pulse">
+            Cargando tus proyectos...
+            </p>
+        </div>
+        );
+    }
     if(isError) return <Navigate to='/404' />
 
     if(data) return (
@@ -40,6 +56,7 @@ export default function ProjectDetailsView() {
             />
             <AddTaskModal />
             <EditTaskData />
+            <TaskModalDetails />
         </>
     )
 }

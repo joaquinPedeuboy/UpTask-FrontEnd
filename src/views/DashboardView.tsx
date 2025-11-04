@@ -1,14 +1,15 @@
 import { Fragment } from 'react'
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
 import { EllipsisVerticalIcon } from '@heroicons/react/20/solid'
-import { Link } from "react-router-dom"
+import { Link, Navigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { deleteProject, getProjects } from "@/api/ProjectAPI"
 import { toast } from 'react-toastify'
+import { Puff } from "react-loader-spinner";
 
 export default function DashboardView() {
 
-    const { data, isLoading } = useQuery({
+    const { data, isLoading, isError } = useQuery({
         queryKey: ['projects'],
         queryFn: getProjects
     })
@@ -25,7 +26,23 @@ export default function DashboardView() {
         }
     })
 
-    if(isLoading) return 'Cargando..'
+    if (isLoading) {
+        return (
+        <div className="flex flex-col justify-center items-center h-screen space-y-5">
+            <Puff
+            height={100}
+            width={100}
+            color="#a855f7" // color fucsia similar a tus botones
+            ariaLabel="puff-loading"
+            />
+            <p className="text-gray-500 text-xl font-semibold animate-pulse">
+                Cargando tus proyectos...
+            </p>
+        </div>
+        );
+    }
+
+    if(isError) return <Navigate to='/404' />
 
     if(data) return (
         <>
