@@ -32,7 +32,7 @@ export default function DashboardView() {
             <Puff
             height={100}
             width={100}
-            color="#a855f7" // color fucsia similar a tus botones
+            color="#a855f7"
             ariaLabel="puff-loading"
             />
             <p className="text-gray-500 text-xl font-semibold animate-pulse">
